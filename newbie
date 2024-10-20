@@ -1,0 +1,226 @@
+<html><head></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Jetton ($NEW)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            color: #e0e0e0;
+            background: #000;
+        }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        
+        .header-logo {
+            width: auto;
+            height: 350px;
+            display: block;
+            margin: 0 auto;
+        }
+        .page-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            padding-top: 10px; /* Добавим отступ сверху */
+        }
+        .content {
+            max-width: 800px;
+            text-align: center;
+            z-index: 1;
+        }
+        h1 {
+            font-size: 3.5rem;
+            color: #00bcd4;
+            text-shadow: 0 0 10px rgba(0,188,212,0.5);
+            margin-bottom: 1rem;
+        }
+        h2 {
+            font-size: 2.5rem;
+            color: #4fc3f7;
+            margin-bottom: 1rem;
+        }
+        p, ul, ol {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        .buy-button {
+            background: linear-gradient(45deg, #00bcd4, #1e88e5);
+            color: #fff;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 50px;
+            box-shadow: 0 0 15px rgba(0,188,212,0.5);
+        }
+        .buy-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0,188,212,0.7);
+        }
+        .logo-container {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 2rem;
+            position: relative;
+        }
+        .logo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            animation: float 6s ease-in-out infinite, glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 5px rgba(0,188,212,0.5)); }
+            to { filter: drop-shadow(0 0 20px rgba(0,188,212,0.8)); }
+        }
+        .background-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+        }
+        .tokenomics-chart {
+            width: 300px;
+            height: 300px;
+            margin: 2rem auto;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .feature-item {
+            background-color: rgba(255,255,255,0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,188,212,0.2);
+            transition: all 0.3s ease;
+        }
+        .feature-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 15px rgba(0,188,212,0.4);
+        }
+    </style>
+</head>
+<body>
+   
+
+    <!-- Section 1: Hero Section -->
+    <section id="section1" class="page-section">
+        <div class="background-shapes">
+                      <svg class="shape" style="top: 10%; left: 10%;" width="50" height="50"><circle cx="25" cy="25" r="20" fill="#00bcd4"/></svg>
+            <svg class="shape" style="top: 70%; left: 80%;" width="70" height="70"><rect width="50" height="50" fill="#1e88e5"/></svg>
+            <svg class="shape" style="top: 40%; left: 60%;" width="60" height="60"><polygon points="30,0 60,60 0,60" fill="#4fc3f7"/></svg>
+        </div>
+        <div class="content">
+            <div class="logo-container">
+                <img src="https://party.websim.ai/a/62b77d7c-cec6-4e94-ac56-2bf36efe3692" alt="New Jetton Logo" class="logo">
+          
+            </div>
+            <h1>Welcome to New Jetton ($NEW)</h1>
+            <p>The innovative token for the next generation of crypto enthusiasts!</p>
+            <button class="buy-button" onclick="buyToken()">BUY $NEW</button>
+        </div>
+    </section>
+
+    <!-- Section 2: Tokenomics -->
+    <section id="section2" class="page-section">
+        <div class="content">
+            <h2>Tokenomics</h2>
+            <svg class="tokenomics-chart" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="transparent" stroke="#333" stroke-width="10"/>
+                <circle cx="50" cy="50" r="45" fill="transparent" stroke="#00bcd4" stroke-width="10" stroke-dasharray="56.5 283" stroke-dashoffset="0"/>
+                <circle cx="50" cy="50" r="45" fill="transparent" stroke="#1e88e5" stroke-width="10" stroke-dasharray="56.5 283" stroke-dashoffset="-56.5"/>
+                <circle cx="50" cy="50" r="45" fill="transparent" stroke="#03a9f4" stroke-width="10" stroke-dasharray="56.5 283" stroke-dashoffset="-113"/>
+                <circle cx="50" cy="50" r="45" fill="transparent" stroke="#4fc3f7" stroke-width="10" stroke-dasharray="28.3 283" stroke-dashoffset="-169.5"/>
+                <circle cx="50" cy="50" r="45" fill="transparent" stroke="#81d4fa" stroke-width="10" stroke-dasharray="28.3 283" stroke-dashoffset="-197.8"/>
+            </svg>
+            <ul>
+                <li>Team and Developers: 20%</li>
+                <li>Public Distribution (IDO/ICO): 30%</li>
+                <li>Liquidity: 30%</li>
+                <li>Marketing: 10%</li>
+                <li>Innovation and Development Fund: 10%</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Section 3: Why New Jetton? -->
+    <section id="section3" class="page-section">
+        <div class="content">
+            <h2>Why New Jetton?</h2>
+            <p>New Jetton ($NEW) is not just another token; it's a gateway to the future of decentralized finance!</p>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h3>Exclusive DeFi Products</h3>
+                    <p>Access cutting-edge decentralized financial tools</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Community Governance</h3>
+                    <p>Have your say in the future of $NEW</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Staking Rewards</h3>
+                    <p>Earn passive income by staking your $NEW tokens</p>
+                </div>
+                <div class="feature-item">
+                    <h3>Growth Potential</h3>
+                    <p>Be part of a rapidly evolving crypto ecosystem</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: How to Buy -->
+    <section id="section4" class="page-section">
+        <div class="content">
+            <h2>How to Buy $NEW</h2>
+            <p>Getting your hands on New Jetton is simple. Follow these steps:</p>
+            <ol>
+                <li>Set up a compatible crypto wallet</li>
+                <li>Purchase $NEW on our partner exchanges</li>
+                <li>Hold $NEW and become part of our growing ecosystem!</li>
+            </ol>
+            <button class="buy-button" onclick="buyToken()">BUY $NEW</button>
+        </div>
+    </section>
+
+    <script>
+        function buyToken() {
+            window.location.href = "https://newjetton.exchange/buy";
+        }
+    </script>
+</body>
+</html>
