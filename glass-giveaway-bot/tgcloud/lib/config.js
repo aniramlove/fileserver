@@ -1,0 +1,1 @@
+export const ADMIN_IDS=[];export const REFERRAL_BONUS_TICKETS=1;export const BOOST_BONUS_TICKETS=1;export const CAPTCHA_TTL_SECONDS=300;export const CAPTCHA_MAX_ATTEMPTS=5;
