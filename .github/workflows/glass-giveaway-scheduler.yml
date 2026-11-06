@@ -1,0 +1,29 @@
+name: Glass Giveaway Scheduler
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: glass-giveaway-scheduler
+  cancel-in-progress: false
+
+jobs:
+  run-scheduler:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: glass-giveaway-bot/package.json
+      - name: Install project dependencies
+        working-directory: glass-giveaway-bot
+        run: npm install
+      - name: Process scheduled giveaways
+        working-directory: glass-giveaway-bot
+        env:
+          TGCLOUD_TOKEN: ${{ secrets.TGCLOUD_TOKEN }}
+        run: npx tgcloud run endpoints/processSchedule '{}'

@@ -1,0 +1,2 @@
+import{api}from'sdk';
+export default async function(message){const text=String(message?.text||'').trim();if(text==='/id'){await api.sendMessage({chat_id:message.chat.id,text:'Твой Telegram ID: '+message.from.id+'\nДобавь это число в ADMIN_IDS в tgcloud/lib/config.js, если это аккаунт администратора.'});return;}if(text.startsWith('/start')){await api.sendMessage({chat_id:message.chat.id,text:'Привет! Это Giveaway Club 🎁\n\nОткрой Mini App через кнопку меню бота, чтобы смотреть розыгрыши, участвовать и приглашать друзей.\n\nКоманда /id показывает твой Telegram ID.'});}}
