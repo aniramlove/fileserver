@@ -21,4 +21,4 @@ jobs:
           cache: npm
           cache-dependency-path: glass-giveaway-bot/package.json
       - run: npm install
-      - run: npm run build
+      - name: Check Serverless JavaScript syntax\n        run: find tgcloud -name '*.js' -print0 | xargs -0 -n1 node --check\n      - run: npm run build

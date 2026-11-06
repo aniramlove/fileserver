@@ -48,7 +48,7 @@ npx tgcloud login
 
 Paste the CLI Access token when prompted. It is saved locally under .tgcloud and is ignored by Git.
 
-## Configure the administrator
+### Important: protect the existing Serverless project\n\nBecause this is an existing bot, do not deploy blindly. After `npx tgcloud login`, run:\n\n```powershell\nnpx tgcloud fetch\nnpx tgcloud status\n```\n\nReview the status before the first push. Telegram Serverless full push mirrors the local `tgcloud/` module set and can remove remote modules that are not present in this folder. If the bot already has handlers or database schema for another feature, stop and merge those modules into this project before deploying. Do not run `npx tgcloud pull` over this project without first making a backup.\n\n## Configure the administrator
 
 1. In a private chat with the bot, send /id (after the first deployment of the message handler).
 2. Copy the numeric Telegram ID.

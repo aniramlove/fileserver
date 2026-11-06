@@ -3,7 +3,7 @@ function randomIndex(n){const a=new Uint32Array(1);crypto.getRandomValues(a);ret
 function draw(rows,count){const pool=rows.map(r=>({...r,weight:Math.max(1,Number(r.tickets)||1)})),out=[];while(pool.length&&out.length<count){let cursor=randomIndex(pool.reduce((s,r)=>s+r.weight,0)),i=0;for(;i<pool.length;i++){cursor-=pool[i].weight;if(cursor<0)break;}out.push(pool.splice(Math.min(i,pool.length-1),1)[0]);}return out;}
 export default async function(){const now=Math.floor(Date.now()/1000),all=await db.select().from(giveaways).all(),actions=[];
 for(const g of all){
-if(g.status==='scheduled'&&g.startsAt<=now&&!g.startPosted){if(g.announcementChatId)await api.sendMessage({chat_id:g.announcementChatId,text:'🎁 Начался розыгрыш «'+g.title+'»!\nПриз: '+g.prize+'\nПобедителей: '+g.winnerCount});await db.update(giveaways).set({status:'active',startPosted:true}).where(eq(giveaways.id,g.id)).run();actions.push({giveawayId:g.id,action:'started'});}
+if(g.status==='scheduled'&&g.startsAt<=now&&!g.startPosted){if(g.announcementChatId){try{await api.sendMessage({chat_id:g.announcementChatId,text:'🎁 Начался розыгрыш «'+g.title+'»!\nПриз: '+g.prize+'\nПобедителей: '+g.winnerCount});}catch(e){console.warn('Start announcement failed',g.id,e?.description||e);actions.push({giveawayId:g.id,action:'start_post_failed'});continue;}}await db.update(giveaways).set({status:'active',startPosted:true}).where(eq(giveaways.id,g.id)).run();actions.push({giveawayId:g.id,action:'started'});}
 if(g.status!=='finished'&&g.endsAt<=now&&!g.endPosted){
 const existing=await db.select().from(winners).where(eq(winners.giveawayId,g.id)).all();let selected=existing.sort((a,b)=>a.place-b.place);
 if(!selected.length){const participants=await db.select().from(entries).where(eq(entries.giveawayId,g.id)).all(),eligible=[];
@@ -16,7 +16,6 @@ selected=draw(eligible,g.winnerCount);
 if(selected.length){await db.insert(winners).values(selected.map((row,i)=>({giveawayId:g.id,userId:row.userId,place:i+1,ticketsAtDraw:row.tickets}))).onConflictDoNothing().run();selected=await db.select().from(winners).where(eq(winners.giveawayId,g.id)).all();selected.sort((a,b)=>a.place-b.place);}
 }
 const lines=[];for(const w of selected){const u=await db.select().from(users).where(eq(users.tgId,w.userId)).get();lines.push(w.place+'. '+(u?.firstName||'Участник')+(u?.username?' (@'+u.username+')':'')+' — ID '+w.userId);}
-if(g.announcementChatId)await api.sendMessage({chat_id:g.announcementChatId,text:selected.length?'🏆 Розыгрыш «'+g.title+'» завершён!\nПобедители:\n'+lines.join('\n'):'Розыгрыш «'+g.title+'» завершён. Подходящих участников не оказалось.'});
-await db.update(giveaways).set({status:'finished',endPosted:true}).where(eq(giveaways.id,g.id)).run();actions.push({giveawayId:g.id,action:'finished',winners:selected.length});
+if(g.announcementChatId){try{await api.sendMessage({chat_id:g.announcementChatId,text:selected.length?'🏆 Розыгрыш «'+g.title+'» завершён!\nПобедители:\n'+lines.join('\n'):'Розыгрыш «'+g.title+'» завершён. Подходящих участников не оказалось.'});}catch(e){console.warn('End announcement failed',g.id,e?.description||e);actions.push({giveawayId:g.id,action:'end_post_failed'});continue;}}\nawait db.update(giveaways).set({status:'finished',endPosted:true}).where(eq(giveaways.id,g.id)).run();actions.push({giveawayId:g.id,action:'finished',winners:selected.length});
 }}
 return{ok:true,processedAt:now,actions};}
