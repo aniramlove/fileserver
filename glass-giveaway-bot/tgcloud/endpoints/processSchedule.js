@@ -26,7 +26,9 @@ function drawWeighted(rows, count) {
 }
 
 export default async function processSchedule(_input, ctx) {
-  if (ctx?.source !== 'github-actions') {\n    throw new Error('This endpoint can only be invoked by the GitHub Actions scheduler.');\n  }
+  if (ctx?.source !== 'github-actions') {
+    throw new Error('This endpoint can only be invoked by the GitHub Actions scheduler.');
+  }
   const now = Math.floor(Date.now() / 1000);
   const all = await db.select().from(giveaways).all();
   const actions = [];
