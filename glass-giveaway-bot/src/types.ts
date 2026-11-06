@@ -1,0 +1,1 @@
+export type Giveaway={id:string;title:string;description:string;prize:string;winnerCount:number;startsAt:number;endsAt:number;participants:number;status:'scheduled'|'active'|'finished';joined:boolean;referralLink?:string};export type ListResponse={giveaways:Giveaway[];user:{id:number;firstName:string;username?:string}};
