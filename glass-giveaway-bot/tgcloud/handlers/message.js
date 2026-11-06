@@ -1,0 +1,1 @@
+import{api}from'sdk';export default async function(message){if(!message?.text?.startsWith('/start'))return;await api.sendMessage({chat_id:message.chat.id,text:'Привет! Это Giveaway Club 🎁 Открой Mini App через кнопку меню бота, чтобы участвовать в розыгрышах, приглашать друзей и отслеживать билеты.'});}
