@@ -26,4 +26,4 @@ jobs:
         working-directory: glass-giveaway-bot
         env:
           TGCLOUD_TOKEN: ${{ secrets.TGCLOUD_TOKEN }}
-        run: npx tgcloud run endpoints/processSchedule '{}'
+        run: npx tgcloud run endpoints/processSchedule '{}' --ctx '{ source: "github-actions" }'
