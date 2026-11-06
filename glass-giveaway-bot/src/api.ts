@@ -7,7 +7,7 @@ list:()=>window.Telegram?.WebApp?.Serverless?call<ListResponse>('getGiveaways'):
 captcha:(giveawayId:string)=>call<Captcha>('getCaptcha',{giveawayId}),
 verifyCaptcha:(giveawayId:string,challengeId:string,answer:string)=>call<{ok:boolean}>('verifyCaptcha',{giveawayId,challengeId,answer}),
 join:(giveawayId:string)=>call<{ok:boolean;tickets:number;boosts:number;referrals:number}>('joinGiveaway',{giveawayId}),
-stats:()=>call<{entries:number;referrals:number;wins:number;tickets:number;isAdmin:boolean}>('getMyStats'),
+stats:()=>call<{telegramId:number;entries:number;referrals:number;wins:number;tickets:number;isAdmin:boolean}>('getMyStats'),
 winners:()=>call<{winners:Winner[]}>('getWinners'),
 create:(input:Record<string,unknown>)=>call<{ok:boolean;giveawayId:string}>('createGiveaway',input),
 };
