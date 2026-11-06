@@ -1,6 +1,10 @@
 name: Glass Giveaway Scheduler
 
 on:
+  push:
+    paths:
+      - ".github/workflows/glass-giveaway-scheduler.yml"
+      - "glass-giveaway-bot/tgcloud/**"
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
@@ -26,4 +30,9 @@ jobs:
         working-directory: glass-giveaway-bot
         env:
           TGCLOUD_TOKEN: ${{ secrets.TGCLOUD_TOKEN }}
-        run: npx tgcloud run endpoints/processSchedule '{}' --ctx '{ source: "github-actions" }'
+        run: |
+          if [ -z "$TGCLOUD_TOKEN" ]; then
+            echo "::notice::Add the TGCLOUD_TOKEN repository secret to enable the scheduler."
+            exit 0
+          fi
+          npx tgcloud run endpoints/processSchedule '{}' --ctx '{ source: "github-actions" }'
