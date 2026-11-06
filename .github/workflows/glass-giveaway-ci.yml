@@ -1,0 +1,24 @@
+name: Glass Giveaway CI
+
+on:
+  push:
+    paths:
+      - "glass-giveaway-bot/**"
+      - ".github/workflows/glass-giveaway-ci.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: glass-giveaway-bot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: glass-giveaway-bot/package.json
+      - run: npm install
+      - run: npm run build
