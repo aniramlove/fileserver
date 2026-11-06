@@ -1,128 +1,188 @@
 # Glass Giveaway Bot
 
-Mini App для Telegram-розыгрышей. Frontend: React + TypeScript + Vite. Backend and SQLite: Telegram Serverless. All code for this project is kept in this folder; the scheduler workflow is added at the repository root under .github/workflows because GitHub only loads workflows from that location.
+Telegram Mini App для розыгрышей на Telegram Serverless. Frontend — React + TypeScript + Vite, backend — Telegram Serverless и SQLite.
 
-## Implemented
+## Что реализовано
 
-- Liquid Glass UI with Telegram light/dark theme support.
-- Giveaway list and details.
-- First-open arithmetic CAPTCHA, stored server-side per user and giveaway; successful verification is remembered.
-- Mandatory channel/group subscription checks at join and again before the winner draw.
-- Referral deep links through the bot's Main Mini App; valid referrals add configurable weighted tickets.
-- Live Boost count read through getUserChatBoosts; ticket balance is recalculated when the list is loaded and again at the draw.
-- Admin panel to create giveaways, set prizes, dates, winners, announcement chat, Boost chat and required subscriptions.
-- Weighted winner draw without replacement, persisted winners and repeat-run protection.
-- GitHub Actions scheduler every five minutes plus manual run.
+- Liquid Glass интерфейс с адаптацией к светлой и тёмной теме Telegram.
+- Список розыгрышей, карточка условий, число участников и победителей.
+- Арифметическая CAPTCHA при первом открытии каждого розыгрыша. Ответ хранится на сервере; после прохождения проверка запоминается для конкретного пользователя и розыгрыша.
+- Проверка подписки на обязательные каналы и группы при вступлении и повторно перед выбором победителей.
+- Реферальные ссылки Mini App; приглашённые, которые вступили в розыгрыш, дают пригласившему дополнительные билеты.
+- Пересчёт количества Boosts через Telegram Bot API и дополнительные билеты за Boosts.
+- Профиль со статистикой и Telegram ID пользователя.
+- Админ-панель для создания розыгрышей, настройки приза, дат, количества победителей, чатов объявлений, Boosts и обязательных подписок.
+- Взвешенный выбор победителей без повторного выбора одного человека; победители сохраняются в БД.
+- GitHub Actions: проверка сборки и синтаксиса backend; планировщик стартов и завершений каждые пять минут.
 
-## Requirements
+## Перед началом
 
-- Windows 10/11.
-- Node.js 18+ (recommended: current Node.js 22 LTS) and Git.
-- Existing Telegram bot with Serverless enabled in @BotFather.
-- You must be able to add the bot as administrator to required and Boost-tracked channels/groups.
-- GitHub Actions enabled for the repository.
+Нужно:
+- Windows 10/11;
+- Node.js 22 LTS (минимум Node.js 18);
+- Git for Windows;
+- существующий Telegram-бот, у которого в @BotFather включён Serverless;
+- доступ администратора в GitHub-репозитории.
 
-## Run on Windows
+**Не отправляй мне и не коммить в GitHub CLI Access token или Bot API token.** Токен вводится локально в терминале или хранится в GitHub Actions Secrets.
 
-Open PowerShell:
+## 1. Скачать проект на компьютер
 
-```powershell
+Открой PowerShell и выполни:
+
+\`\`\`powershell
 git clone https://github.com/aniramlove/fileserver.git
-cd fileserver\glass-giveaway-bot
+cd fileserver\\glass-giveaway-bot
 node -v
 npm -v
 npm install
-```
+\`\`\`
 
-Use Node 18 or newer. If node/npm commands are not found, install Node.js LTS from https://nodejs.org and reopen PowerShell.
+Если команды \`git\`, \`node\` или \`npm\` не найдены, установи Git for Windows и Node.js LTS, затем закрой и снова открой PowerShell.
 
-## Connect the existing bot
+## 2. Подключить существующего бота
 
-1. In Telegram, open @BotFather, choose your existing bot, then Serverless → CLI Access → Access token.
-2. Copy the **CLI Access token**. It looks like app12345:secret. It is NOT the normal Bot API token. Never commit it or send it in chat.
-3. From this project folder run:
+1. Открой @BotFather → выбери нужного бота → Serverless → CLI Access → Access token.
+2. Скопируй **CLI Access token**. Он имеет формат вроде \`app12345:...\`. Это отдельный токен Serverless, не обычный Bot API token.
+3. В PowerShell, находясь в папке \`glass-giveaway-bot\`, выполни:
 
-```powershell
+\`\`\`powershell
 npx tgcloud login
-```
+\`\`\`
 
-Paste the CLI Access token when prompted. It is saved locally under .tgcloud and is ignored by Git.
+Вставь CLI Access token в интерактивный запрос. CLI сохранит его локально в \`.tgcloud/\`; эта папка добавлена в \`.gitignore\`.
 
-### Important: protect the existing Serverless project\n\nBecause this is an existing bot, do not deploy blindly. After `npx tgcloud login`, run:\n\n```powershell\nnpx tgcloud fetch\nnpx tgcloud status\n```\n\nReview the status before the first push. Telegram Serverless full push mirrors the local `tgcloud/` module set and can remove remote modules that are not present in this folder. If the bot already has handlers or database schema for another feature, stop and merge those modules into this project before deploying. Do not run `npx tgcloud pull` over this project without first making a backup.\n\n## Configure the administrator
+## 3. Обязательно проверить, что уже развёрнуто у бота
 
-1. In a private chat with the bot, send /id (after the first deployment of the message handler).
-2. Copy the numeric Telegram ID.
-3. Open tgcloud/lib/config.js and replace the empty array:
+Поскольку бот уже существует, не запускай полный \`npx tgcloud push\`, пока не проверишь облачную версию:
 
-```js
-export const ADMIN_IDS = [123456789];
-```
+\`\`\`powershell
+npx tgcloud fetch
+npx tgcloud status
+\`\`\`
 
-You may add more IDs separated by commas. Keep this file free of bot tokens.
+\`fetch\` получает сведения о развёрнутом состоянии, \`status\` показывает отличия. Эти команды не заменяют локальные файлы содержимым из облака.
 
-## Build and deploy
+**Почему это важно:** полный \`push\` синхронизирует весь набор модулей из локальной папки \`tgcloud/\` и удаляет из облака модули, которых нет локально. В проекте специально нет собственного \`handlers/message.js\`, чтобы не подменять обработчик сообщений твоего существующего бота.
 
-From glass-giveaway-bot:
+Для безопасного первого развёртывания используй выборочную отправку модулей — она не удаляет остальные обработчики бота:
 
-```powershell
+\`\`\`powershell
 npm run build
-npx tgcloud push
+npx tgcloud push lib/
+npx tgcloud push endpoints/
+\`\`\`
+
+### Важно про существующую базу данных
+
+В проекте есть собственный \`tgcloud/schema.js\` с таблицами розыгрышей. Если у твоего бота уже есть своя схема или таблицы, **не заменяй её этим файлом целиком**. Сначала объедини определения таблиц розыгрышей из проекта с существующим \`schema.js\`, сохрани все прежние таблицы и экспорты, затем отправь объединённую схему:
+
+\`\`\`powershell
+npx tgcloud push schema
 npx tgcloud migrate
-```
+\`\`\`
 
-During migrate, review the listed schema changes and confirm the initial table/index creation. Do not skip the migration: without it the database tables do not exist.
+В миграторе внимательно просмотри список изменений. Для нового проекта добавятся таблицы и индексы розыгрышей. Не подтверждай удаление таблиц, которые уже использует твой бот.
 
-The push output prints the Mini App URL, similar to https://app123456.tgcloud.ai/. Keep the exact URL.
+Если у Serverless-проекта ещё нет собственных модулей и схемы, после проверки можно отправить текущую схему командой выше без объединения.
 
-After changing ADMIN_IDS, repeat npx tgcloud push. After changing schema.js, push and then run npx tgcloud migrate again.
+## 4. Получить Telegram ID и включить админ-панель
 
-## Configure Telegram launch links
+1. Разверни backend и примени схему по инструкции выше.
+2. Открой своего бота в Telegram, запусти Mini App и перейди во вкладку «Профиль».
+3. Там отображается твой Telegram ID.
+4. На компьютере открой файл \`tgcloud/lib/config.js\` и укажи этот ID в массиве:
 
-In @BotFather:
+\`\`\`js
+export const ADMIN_IDS = [123456789];
+\`\`\`
 
-1. Configure the bot's **Main Mini App** and set its URL to the exact tgcloud.ai URL from push. This is needed for referral deep links with startapp.
-2. Use /setmenubutton (or Bot Settings → Menu Button) and set the menu button text (for example, “Розыгрыши”) plus the same URL.
+Замени число на свой ID. Можно указать несколько ID через запятую.
 
-Then open the bot and tap the menu button. The app is intended to run inside Telegram; opening the hosted URL in an ordinary browser shows only demo content.
+5. Отправь обновлённую библиотеку на Serverless:
 
-## Add channels and turn on features
+\`\`\`powershell
+npx tgcloud push lib/
+\`\`\`
 
-- Add the bot as an administrator to every mandatory channel/group. For channels where the bot must publish announcements, allow posting messages.
-- For each chat whose Boosts should count, make the bot an administrator. Telegram's getUserChatBoosts method requires administrator rights.
-- In the admin tab, create a giveaway. Enter each required chat on a separate line as @channel_username|Display name (or -100...|Display name).
-- Announcement chat is where the bot posts the start and final results. Use @channel_username or a numeric chat ID.
-- Boost chat is the channel/supergroup whose current Boosts by a participant are counted.
-- The default configuration awards 1 additional ticket per valid referral and 1 per active Boost. Change the two constants in tgcloud/lib/config.js to set different weights.
+6. Закрой и снова открой Mini App. Появится вкладка «Админ».
 
-## Enable the GitHub Actions scheduler
+## 5. Опубликовать Mini App
 
-The workflow is at the repository root: .github/workflows/glass-giveaway-scheduler.yml.
+После настройки backend и схемы собери frontend и отправь только статические файлы:
 
-1. Open the GitHub repository → Settings → Secrets and variables → Actions.
-2. Create a repository secret named TGCLOUD_TOKEN.
-3. Its value is the same Telegram Serverless **CLI Access token** used for tgcloud login (app...:secret).
-4. Open Actions and ensure workflows are enabled. Use “Glass Giveaway Scheduler” → “Run workflow” for a manual test.
+\`\`\`powershell
+npm run build
+npx tgcloud push dist/
+\`\`\`
 
-The schedule checks every five minutes, but GitHub may delay scheduled runs. It is not a real-time guarantee. The scheduler posts the start/end announcement and performs the final weighted draw. If you do not need automatic scheduling, you can run the endpoint manually from the project folder:
+В выводе CLI появится адрес приложения вида \`https://app123456.tgcloud.ai/\`. Скопируй точный адрес.
 
-```powershell
-npx tgcloud run endpoints/processSchedule '{}'
-```
+В @BotFather:
+1. Открой настройки существующего бота и настрой его **Main Mini App**, указав URL из CLI.
+2. Настрой кнопку меню через \`/setmenubutton\` или Bot Settings → Menu Button. Назови её, например, «Розыгрыши», и укажи тот же URL.
+3. Открой бота и нажми кнопку меню.
 
-## Recommended first test
+Main Mini App нужен для реферальных ссылок с параметром \`startapp\`. Telegram передаёт этот параметр в Mini App как \`start_param\`.
 
-1. Create a private test channel.
-2. Add the bot as administrator.
-3. Deploy, migrate and set the Main Mini App/menu button.
-4. Create a test giveaway with start time a few minutes ahead, end time 10–15 minutes ahead, and require that test channel.
-5. Join with a second Telegram account, test an incorrect and correct CAPTCHA, test subscription validation, then test the referral link.
-6. Add Boosts to the configured channel from a test account and reopen the giveaway list to refresh ticket counts.
-7. Run the scheduler manually or wait for the next GitHub Actions tick, then confirm the winner post.
+## 6. Подготовить каналы
 
-## Safety / production notes
+Для надёжной проверки подписки добавь бота администратором в каждый обязательный канал/группу. Для канала, в который бот публикует объявления и итоги, дай ему право отправлять сообщения.
 
-- Telegram Serverless validates Mini App initData before invoking an endpoint; the backend derives the user identity from ctx.initData, not a client-supplied user ID.
-- Do not put Bot API tokens or CLI Access tokens in the repository or frontend.
-- GitHub cron can be delayed, so do not advertise exact-second start/end execution.
-- Subscription verification can only be trusted when Telegram returns member information; grant the bot administrator rights and check BotFather/Telegram errors.
-- The initial implementation is a functional MVP scaffold, not an audited high-volume raffle platform. Before a large public campaign, add automated tests, operational alerts, independent draw audit logs and explicit concurrency/rate-limit handling.
+Для учёта Boosts добавь бота администратором в канал, Boosts которого учитываются. Метод \`getUserChatBoosts\` требует прав администратора.
+
+В админ-панели при создании розыгрыша:
+- «Чат публикации» — куда бот отправляет объявление о начале и итоги; укажи \`@channel\` или chat ID.
+- «Канал Boosts» — канал, Boosts которого учитываются; укажи \`@channel\` или chat ID.
+- «Обязательные подписки» — по одному чату на строку в формате \`@channel|Название канала\`. Можно указать числовой ID вида \`-100...\`.
+
+По умолчанию один приглашённый даёт +1 билет, один Boost даёт +1 билет. Вес можно изменить в \`tgcloud/lib/config.js\` через \`REFERRAL_BONUS_TICKETS\` и \`BOOST_BONUS_TICKETS\`, затем выполнить \`npx tgcloud push lib/\`.
+
+## 7. Включить автоматические старты и завершения
+
+В корне репозитория уже добавлен workflow:
+
+\`.github/workflows/glass-giveaway-scheduler.yml\`
+
+Чтобы он мог обращаться к Telegram Serverless:
+
+1. Открой GitHub → репозиторий \`aniramlove/fileserver\` → Settings → Secrets and variables → Actions.
+2. Создай **New repository secret** с именем \`TGCLOUD_TOKEN\`.
+3. В значение вставь тот же CLI Access token Serverless, который использовал для \`npx tgcloud login\`. Не добавляй токен в файл и не вставляй его в обычные переменные workflow.
+4. Открой вкладку Actions и убедись, что workflows разрешены.
+5. Запусти «Glass Giveaway Scheduler» вручную через Run workflow для первой проверки.
+
+Затем workflow будет проверять розыгрыши каждые пять минут. GitHub может задерживать cron-запуски, поэтому публикация не гарантируется ровно в секунду начала или окончания.
+
+## 8. Проверить первый розыгрыш
+
+Лучше начать с тестового канала:
+1. Создай тестовый канал и добавь бота администратором.
+2. Создай розыгрыш в Mini App с началом через несколько минут и окончанием через 10–15 минут.
+3. Добавь тестовый канал в обязательные подписки и как чат для публикации.
+4. Открой карточку розыгрыша с тестового аккаунта, реши CAPTCHA и попробуй вступить без подписки.
+5. Подпишись на канал и вступи повторно. Повторно проходить CAPTCHA для этого розыгрыша не потребуется.
+6. Проверь реферальную ссылку с другого аккаунта.
+7. Для проверки Boosts укажи тестовый канал Boosts и используй аккаунт, который отдал каналу Boost.
+8. Запусти workflow вручную и проверь сообщение с итогами.
+
+## Команды на будущее
+
+Из папки \`glass-giveaway-bot\`:
+
+\`\`\`powershell
+npm run dev
+npm run build
+npx tgcloud status
+npx tgcloud diff
+npx tgcloud push endpoints/
+npx tgcloud push lib/
+npx tgcloud migrate
+npx tgcloud push dist/
+\`\`\`
+
+\`npm run dev\` открывает демонстрационный интерфейс в браузере. Реальное участие и серверные функции работают при запуске Mini App внутри Telegram.
+
+## Что ещё нужно до большого публичного запуска
+
+Это собранный и проверенный CI MVP, но не независимый аудит сервиса для массовых розыгрышей. До больших кампаний добавь мониторинг ошибок и уведомления администратору, журнал/публичную проверяемость выбора победителей, ручной сценарий восстановления после сбоя Telegram API и нагрузочное тестирование.
