@@ -1,1 +1,4 @@
-export type Giveaway={id:string;title:string;description:string;prize:string;winnerCount:number;startsAt:number;endsAt:number;participants:number;status:'scheduled'|'active'|'finished';joined:boolean;referralLink?:string};export type ListResponse={giveaways:Giveaway[];user:{id:number;firstName:string;username?:string}};
+export type Giveaway={id:string;title:string;description:string;prize:string;winnerCount:number;startsAt:number;endsAt:number;participants:number;status:'scheduled'|'active'|'finished';joined:boolean;ownTickets:number;ownBoosts:number;ownReferrals:number;referralLink?:string|null;requirements:string[]};
+export type ListResponse={giveaways:Giveaway[];user:{id:number;firstName:string;username?:string}};
+export type Captcha={alreadyPassed?:boolean;challengeId?:string;question?:string};
+export type Winner={giveawayId:string;giveawayTitle:string;prize:string;userId:number;userName:string;username?:string|null;place:number;createdAt:number};
